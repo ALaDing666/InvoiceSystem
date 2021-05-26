@@ -1,6 +1,6 @@
 <template>
   <div class="top-nav-box">
-    <van-nav-bar v-if="isShow" fixed placeholder @click-left="onClickLeft">
+    <van-nav-bar v-if="isShow" fixed placeholder @click-left="onClickLeft()">
       <template #left>
         <van-icon :name="leftIcon" size="20" color="white"/>
         <span class="left-title">{{ leftText }}</span>
@@ -19,8 +19,6 @@
         </van-popover>
       </template>
     </van-nav-bar>
-
-    <!-- <van-nav-bar v-if="!isShow" :left-text="leftText" left-arrow/> -->
   </div>
 </template>
 
@@ -34,10 +32,10 @@ export default {
   props: ['isShow', 'leftIcon', 'rigthIcon', 'leftText', 'actions'],
   methods: {
     onSelect (action) {
-      this.$toast.fail(action.text)
+      this.$emit('actionClick', action)
     },
     onClickLeft () {
-      this.$router.go(-1)
+      this.$emit('leftClick')
     }
   }
 }
@@ -57,8 +55,4 @@ export default {
 /deep/ .van-popover__wrapper i {
   margin-top: 6px;
 }
-// /deep/ .van-nav-bar__text {
-//   color: white;
-//   font-size: 16px;
-// }
 </style>

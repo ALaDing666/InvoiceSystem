@@ -11,9 +11,9 @@
     <div class="logo">
       <img src="@/assets/image/logo-invoice.jpg" alt="">
     </div>
-    <van-form @submit="login">
+    <van-form @submit="login()">
       <van-field
-        v-model="accountNum"
+        v-model="model.username"
         name="账号"
         label="账号"
         left-icon="manager-o"
@@ -22,7 +22,7 @@
         clearable
       />
       <van-field
-        v-model="password"
+        v-model="model.password"
         type="password"
         name="密码"
         label="密码"
@@ -49,17 +49,28 @@ export default {
   },
   data () {
     return {
-      accountNum: '',
-      password: ''
+      model: {
+        username: '',
+        password: ''
+      }
     }
   },
   methods: {
     staffLogin () {
       this.$router.push('/staffLogin')
     },
-    login () {
-      if (!this.accountNum || !this.password) {
+    async login () {
+      if (!this.model.username || !this.model.password) {
         this.$toast.fail('未填写完整')
+      } else {
+        const res = await this.$ajax.post('/admin/login', this.model)
+        if (res.data.code === 200) {
+          this.$toast.success('登录成功')
+          sessionStorage.setItem('token', res.data.token)
+          this.$router.push('/reimburse')
+        } else {
+          this.$toast.fail(res.data.msg)
+        }
       }
     }
   }

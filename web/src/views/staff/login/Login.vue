@@ -13,16 +13,16 @@
     </div>
     <van-form @submit="login">
       <van-field
-        v-model="phone"
-        name="手机号"
-        label="手机号"
-        left-icon="user-o"
+        v-model="model.number"
+        name="工号"
+        label="工号"
+        left-icon="discount"
         size="large"
-        placeholder="请输入手机号"
+        placeholder="请输入工号"
         clearable
       />
       <van-field
-        v-model="password"
+        v-model="model.password"
         type="password"
         name="密码"
         label="密码"
@@ -30,8 +30,12 @@
         size="large"
         placeholder="请输入密码"
         clearable
-      />
-      <div class="register" @click="goRegister">去注册</div>
+      >
+      <!-- <template #button>
+        <van-button round plain hairline size="small" type="info" @click="sendCode">验证码登录</van-button>
+      </template> -->
+      </van-field>
+      <!-- <div class="register" @click="goRegister">去注册</div> -->
       <div style="margin: 16px;">
         <van-button round block type="info" native-type="submit">
           登录
@@ -50,22 +54,37 @@ export default {
   },
   data () {
     return {
-      phone: '',
-      password: ''
+      model: {
+        number: '',
+        password: ''
+      }
     }
   },
   methods: {
     adminLogin () {
       this.$router.push('/')
     },
-    goRegister () {
-      this.$router.push('/register')
-    },
+    // goRegister () {
+    //   this.$router.push('/register')
+    // },
     async login () {
-      if (!this.phone || !this.password) {
+      if (!this.model.number || !this.model.password) {
         this.$toast.fail('未填写完整')
       } else {
-        // const res = await this.$ajax.post('/')
+        const res = await this.$ajax.post('/users/login', this.model)
+        if (res.data.code === 200) {
+          this.$toast.success('登录成功')
+          sessionStorage.setItem('token', res.data.token)
+          sessionStorage.setItem('userNum', this.model.number)
+          const res1 = await this.$ajax.post(`/users/getUserInfo`, {number: this.model.number})
+          if (res1.data.code === 200) {
+            sessionStorage.setItem('userInfo', JSON.stringify(res1.data.data))
+            sessionStorage.setItem('userId', JSON.stringify(res1.data.data.id))
+            this.$router.push('/invoiceFolder')
+          }
+        } else {
+          this.$toast.fail(res.data.msg)
+        }
       }
     }
   }
