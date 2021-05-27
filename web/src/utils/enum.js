@@ -27,8 +27,8 @@ export let reimStatus = {
 export let adminReimStatus = {
   0: '未报销', // #1989fa 蓝色               即管理员未报销
   1: '待确认', // #07c160 绿色               即管理员已报销
-  2: '已完成', // #8f8f8f 浅灰               即已完成
-  3: '已撤回' // #646566 深灰                即已撤回
+  2: '已完成' // #8f8f8f 浅灰                即已完成
+  // 3: '已撤回' // #646566 深灰                即已撤回
 }
 export let reimStatusColor = {
   0: '#1989fa', // #1989fa 蓝色              即管理员未报销

@@ -8,6 +8,13 @@
       :actions="actions"
       @actionClick="actionClick"
     />
+    <van-sticky offset-top="7vh">
+      <van-dropdown-menu active-color="#1989fa">
+        <van-dropdown-item v-model="order" :options="orders" @change="screen(order,status)" />
+        <van-dropdown-item v-model="status" :options="statuses" @change="screen(order,status)" />
+      </van-dropdown-menu>
+    </van-sticky>
+
     <ul v-if="list.length">
       <li v-for="(item, index) in list" :key="index" @click="handleClick(item)">
         <div class="top">
@@ -16,7 +23,7 @@
         </div>
         <div class="bottom">
           <div>报销人：{{ item.reim_person }}</div>
-          <div>报销时间：{{ item.create_date }}</div>
+          <div>发起时间：{{ item.create_date }}</div>
           <div>报销事由：{{ item.reason }}</div>
           <van-tag plain :color="reimStatusColor[item.status]" size="medium">{{ adminReimStatus[item.status] }}</van-tag>
         </div>
@@ -36,27 +43,41 @@ export default {
     TopNav,
     BottomNav
   },
-  created () {
-    this.getList()
-  },
   data () {
     return {
       adminReimStatus: adminReimStatus,
       reimStatusColor: reimStatusColor,
       actions: [{ text: '退出登录' }],
-      list: []
+      list: [],
+      order: 'DESC',
+      status: 'all',
+      orders: [
+        { text: '按发起时间降序', value: 'DESC' },
+        { text: '按发起时间升序', value: 'ASC' }
+      ],
+      statuses: [
+        { text: '全部状态', value: 'all' },
+        { text: '未报销', value: 0 },
+        { text: '待确认', value: 1 },
+        { text: '已完成', value: 2 }
+      ]
     }
   },
+  created () {
+    this.screen(this.order, this.status)
+  },
   methods: {
-    async getList () {
-      const res = await this.$ajax.get(`/admin/reimList`)
-      if (res.data.code === 200) {
-        this.list = res.data.data
-      }
-    },
     actionClick (action) {
       if (action.text === '退出登录') {
         this.$router.push('/')
+      }
+    },
+    // 筛选
+    async screen (order, status) {
+      let params = { order, status }
+      const res = await this.$ajax.post(`/admin/screenReim`, params)
+      if (res.data.code === 200) {
+        this.list = res.data.data
       }
     },
     handleClick (item) {

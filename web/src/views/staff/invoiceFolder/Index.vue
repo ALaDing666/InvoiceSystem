@@ -33,9 +33,6 @@
           <div>购买方：{{ item.buyer_name }}</div>
           <div>开票日期：{{ item.issue_date }}</div>
           <van-tag plain :color="invoiceColor[item.status]" size="medium">{{ invoiceStatus[item.status] }}</van-tag>
-          <!-- <van-tag v-show="item.status===1" plain color="#1989fa" size="medium">{{ invoiceStatus[item.status] }}</van-tag>
-          <van-tag v-show="item.status===2" plain color="#07c160" size="medium">{{ invoiceStatus[item.status] }}</van-tag>
-          <van-tag v-show="item.status===3" plain color="#8f8f8f" size="medium">{{ invoiceStatus[item.status] }}</van-tag> -->
         </div>
         <div class="bottom" v-if="item.type===1">
           <div>车号：{{ item.taxi_number }}</div>
@@ -110,7 +107,6 @@ export default {
         { text: '已完成', value: 3 },
         { text: '已撤回', value: 4 }
       ]
-
     }
   },
   created () {
@@ -118,13 +114,6 @@ export default {
     this.screen(this.order, this.type, this.status)
   },
   methods: {
-    // async getList () {
-    //   const res = await this.$ajax.get(`/users/invoiceList`)
-    //   if (res.data.code === 200) {
-    //     this.list = res.data.data
-    //     console.log('this.list: ', this.list)
-    //   }
-    // },
     actionClick (action) {
       if (action.text === '手动添加') {
         this.$router.push('/manualEntry')
@@ -132,6 +121,13 @@ export default {
         this.$router.push('/scanInvoice')
       }
     },
+    // async getList () {
+    //   const res = await this.$ajax.get(`/users/invoiceList`)
+    //   if (res.data.code === 200) {
+    //     this.list = res.data.data
+    //     console.log('this.list: ', this.list)
+    //   }
+    // },
     // 筛选
     async screen (order, type, status) {
       console.log('order, type, status: ', order, type, status)

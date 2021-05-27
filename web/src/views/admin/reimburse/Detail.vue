@@ -115,7 +115,7 @@ export default {
         this.$ajax.post('/admin/confirmReim', { reimId }).then(res => {
           if (res.data.code === 200) {
             this.$toast.success('报销成功')
-            this.$router.push('/reimbursements')
+            this.$router.push('/Reimburse')
           } else {
             this.$toast.fail(res.data.msg)
           }

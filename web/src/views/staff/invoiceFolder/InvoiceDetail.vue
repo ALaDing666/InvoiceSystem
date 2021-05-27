@@ -287,15 +287,14 @@ export default {
     //   this.$refs.formData.submit()
     // },
     async preserve () {
+      this.readonly = true
       let params = this.model
       params.type = this.type
       params.uid = sessionStorage.getItem('userId')
-      console.log('params11111111111: ', params)
       if (params.id) {
         const res = await this.$ajax.post('/users/updateInvoice', params)
         if (res.data.code === 200) {
           this.$toast.success('保存成功')
-          this.readonly = true
         } else {
           this.$toast.fail(res.data.msg)
         }
