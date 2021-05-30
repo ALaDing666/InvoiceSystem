@@ -22,7 +22,7 @@
         readonly
       />
       <van-field
-        v-if="type!==3"
+        v-if="type!==3&&type!==2"
         v-model="model.code"
         required
         :rules="[{ required: true, message: '' }]"
@@ -32,7 +32,7 @@
         :readonly="readonly"
       />
       <van-field
-        v-if="type!==3"
+        v-if="type!==3&&type!==2"
         v-model="model.number"
         required
         :rules="[{ required: true, message: '' }]"
@@ -42,6 +42,7 @@
         :readonly="readonly"
       />
       <van-field
+        v-if="type!==2"
         clickable
         required
         :rules="[{ required: true, message: '' }]"
@@ -65,7 +66,7 @@
       <!-- 增值税专有 -->
       <!-- <div v-show="type===0"> -->
         <van-field
-          v-if="type===0||3"
+          v-if="type===0||type===3"
           v-model="model.total"
           required
           :rules="[{ required: true, message: '' }]"
@@ -152,6 +153,7 @@
           :readonly="readonly"
         />
 
+      <quota-detail v-if="type===2" :readonly="readonly" :quota="model"></quota-detail>
       <van-field
         v-model="model.remarks"
         type="textarea"
@@ -168,24 +170,28 @@
         <van-button v-show="readonly && status===0" plain hairline size="small" type="info" native-type="button" @click="reimburse()">发起报销</van-button>
         <van-button v-show="!readonly" plain hairline size="small" type="info" native-type="button" @click="cancel()">取消</van-button>
         <van-button v-show="!readonly" plain hairline size="small" type="info" native-type="submit">保存</van-button>
-        <!-- <van-button v-show="!readonly" plain hairline size="small" type="info" @click="preserve()">保存</van-button> -->
       </div>
     </van-form>
+
+    <van-loading v-if="show" size="30px" color="#0094ff" vertical></van-loading>
   </div>
 </template>
 
 <script>
 import TopNav from '@/components/common/TopNav.vue'
+import QuotaDetail from './QuotaDetail.vue'
 import { invoiceType, invoiceStatus } from '@/utils/enum.js'
 
 export default {
   components: {
-    TopNav
+    TopNav,
+    QuotaDetail
   },
   data () {
     return {
       invoiceType: invoiceType,
       invoiceStatus: invoiceStatus,
+      show: false,
       type: 0,
       status: 0,
       model: {
@@ -194,8 +200,9 @@ export default {
         code: '',
         number: '',
         taxi_number: '',
-        issue_date: '',
+        issue_date: new Date().toLocaleDateString(),
         total: 0,
+        location: '',
         time: '', // 上下车时间
         unit_price: 0,
         distance: 0,
@@ -218,16 +225,22 @@ export default {
       for (var item in this.model) {
         if (res[item]) this.model[item] = res[item]
       }
-      if (res.date) { // 针对出租车发票
+      if (this.type === 1) { // 针对出租车发票
         this.model.issue_date = res.date
+      } else if (this.type === 2) {
+        this.model.total = res.amount
       }
-      this.model.issue_date = this.model.issue_date.replace('年', '-')
-      this.model.issue_date = this.model.issue_date.replace('月', '-')
-      this.model.issue_date = this.model.issue_date.replace('日', '')
+      if (this.model.issue_date) {
+        this.model.issue_date = this.model.issue_date.replace('年', '-')
+        this.model.issue_date = this.model.issue_date.replace('月', '-')
+        this.model.issue_date = this.model.issue_date.replace('日', '')
+      }
     } else if (this.$route.params.item) { // 发票详情
-      this.model = this.$route.params.item
-      this.type = this.$route.params.item.type
-      this.status = this.$route.params.item.status
+      let item = this.$route.params.item
+      this.model = item
+      this.model.pic = `http://192.168.0.9:3000/${item.pic}`
+      this.type = item.type
+      this.status = item.status
       this.readonly = true
     }
   },
@@ -272,30 +285,24 @@ export default {
           message: '确认不保存此更改吗？'
         }).then(() => {
           this.$router.go(-1)
-          // let imgName = this.model.pic.split('images/')[1]
-          // this.$ajax.post('/users/cancelSave', { imgName }).then((res) => {
-          //   if (res.data.code === 200) {
-          //     this.$router.go(-1)
-          //   }
-          // })
         }).catch(err => {
           console.log('err: ', err)
         })
       }
     },
-    // preserve () {
-    //   this.$refs.formData.submit()
-    // },
     async preserve () {
-      this.readonly = true
+      this.show = true
       let params = this.model
       params.type = this.type
       params.uid = sessionStorage.getItem('userId')
       if (params.id) {
         const res = await this.$ajax.post('/users/updateInvoice', params)
         if (res.data.code === 200) {
+          this.show = false
           this.$toast.success('保存成功')
+          this.$router.push('/invoiceFolder')
         } else {
+          this.show = false
           this.$toast.fail(res.data.msg)
         }
       } else {
@@ -309,9 +316,11 @@ export default {
         }
         const res = await this.$ajax.post('/users/saveInvoice', formData, config)
         if (res.data.code === 200) {
+          this.show = false
           this.$toast.success('录入成功')
           this.$router.push('/invoiceFolder')
         } else {
+          this.show = false
           this.$toast.fail(res.data.msg)
         }
       }
@@ -334,9 +343,9 @@ export default {
   // margin-top: 20px;
   padding-bottom: 8px;
   background-color: white;
-  /deep/.status-field input{
-    color: rgb(143, 143, 143);
-  }
+  // /deep/.status-field input{
+  //   color: rgb(143, 143, 143);
+  // }
   .van-cell__title {
     font-size: 16px;
     font-weight: 700;
@@ -355,5 +364,9 @@ export default {
     }
   }
 }
-
+.van-loading {
+  position: absolute;
+  top: 45%;
+  left: 45%;
+}
 </style>

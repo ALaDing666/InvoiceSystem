@@ -22,8 +22,8 @@
           <span>{{ item.memberNum }}人</span>
         </div>
         <div class="bottom">
-          <div>{{ item.create_date }}</div>
-          <div>{{ item.descpt }}</div>
+          <div>编号：{{ item.number }}</div>
+          <div>创建时间：{{ item.create_date }}</div>
         </div>
         <van-button
           v-show="item.memberNum === 0"
@@ -63,7 +63,6 @@ export default {
       const res = await this.$ajax.get('/admin/groupList')
       if (res.data.code === 200) {
         this.list = res.data.data
-        console.log('this.list: ', this.list)
       }
     },
     actionClick (action) {
@@ -118,12 +117,8 @@ export default {
         display: flex;
         justify-content: space-between;
         margin-bottom: 6px;
-        h4 {
-          // color: rgb(85, 85, 85);
-        }
       }
       .bottom {
-        // position: relative;
         div {
           font-size: 14px;
           color: rgb(143, 143, 143);

@@ -40,9 +40,14 @@
           <div>开票日期：{{ item.issue_date }}</div>
           <van-tag plain :color="invoiceColor[item.status]" size="medium">{{ invoiceStatus[item.status] }}</van-tag>
         </div>
+       <div class="bottom" v-if="item.type===2">
+          <div>地址：{{ item.location }}</div>
+          <div>备注：{{ item.remarks || '无' }}</div>
+          <van-tag plain :color="invoiceColor[item.status]" size="medium">{{ invoiceStatus[item.status] }}</van-tag>
+        </div>
         <div class="bottom" v-if="item.type===3">
-          <div>备注：{{ item.remarks }}</div>
           <div>开票日期：{{ item.issue_date }}</div>
+          <div>备注：{{ item.remarks || '无' }}</div>
           <van-tag plain :color="invoiceColor[item.status]" size="medium">{{ invoiceStatus[item.status] }}</van-tag>
         </div>
       </li>
@@ -96,7 +101,7 @@ export default {
         { text: '全部种类', value: 'all' },
         { text: '增值税发票', value: 0 },
         { text: '出租车发票', value: 1 },
-        { text: '火车票', value: 2 },
+        { text: '定额发票', value: 2 },
         { text: '其他票据', value: 3 }
       ],
       statuses: [

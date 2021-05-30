@@ -15,6 +15,13 @@
         readonly
       />
       <van-field
+        v-model="model.group_number"
+        name="项目组编号"
+        label="项目组编号"
+        placeholder="项目组编号"
+        readonly
+      />
+      <van-field
         v-model="model.reim_person"
         name="报销人"
         label="报销人"
@@ -84,6 +91,11 @@
           <div>开票日期：{{ item.issue_date }}</div>
           <van-tag plain :color="invoiceColor[item.status]" size="medium">{{ invoiceStatus[item.status] }}</van-tag>
         </div>
+       <div class="bottom" v-if="item.type===2">
+          <div>地址：{{ item.location }}</div>
+          <div>备注：{{ item.remarks }}</div>
+          <van-tag plain :color="invoiceColor[item.status]" size="medium">{{ invoiceStatus[item.status] }}</van-tag>
+        </div>
         <div class="bottom" v-if="item.type===3">
           <div>备注：{{ item.remarks }}</div>
           <div>开票日期：{{ item.issue_date }}</div>
@@ -111,6 +123,7 @@ export default {
       list: [],
       model: {
         group_name: JSON.parse(sessionStorage.getItem('userInfo')).groupName,
+        group_number: JSON.parse(sessionStorage.getItem('userInfo')).groupNumber,
         reim_person: JSON.parse(sessionStorage.getItem('userInfo')).name,
         invo_amount: '',
         invo_quantity: '',

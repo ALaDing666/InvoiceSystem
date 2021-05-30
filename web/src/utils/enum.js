@@ -1,7 +1,7 @@
 export let invoiceType = {
   0: '增值税发票',
   1: '出租车发票',
-  2: '火车票',
+  2: '定额发票',
   3: '其他票据'
 }
 export let invoiceStatus = {

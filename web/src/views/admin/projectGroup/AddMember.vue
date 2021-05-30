@@ -14,13 +14,6 @@
         placeholder="姓名"
         :rules="[{ required: true, message: '请填写成员姓名' }]"
       />
-      <!-- <van-field
-        v-model="model.sex"
-        name="性别"
-        label="性别"
-        placeholder="性别"
-        :rules="[{ required: true, message: '请填写成员姓名' }]"
-      /> -->
       <van-field name="性别" label="性别" :rules="[{ required: true, message: '请选择' }]">
         <template #input>
           <van-radio-group v-model="model.sex" direction="horizontal">
@@ -37,7 +30,7 @@
         :rules="[{ required: true, message: '请填写工号' }]"
       />
       <div class="btn-group">
-        <van-button plain hairline size="small" type="info" @click="cancel()">取消</van-button>
+        <van-button plain hairline size="small" type="info" native-type="button" @click="cancel()">取消</van-button>
         <van-button plain hairline size="small" type="info" native-type="submit">确定</van-button>
       </div>
     </van-form>

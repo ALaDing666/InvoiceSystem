@@ -29,6 +29,12 @@
         </div>
       </li>
     </ul>
+    <van-empty
+      v-else
+      class="custom-image"
+      image="https://img01.yzcdn.cn/vant/custom-empty-image.png"
+      description="暂无报销单~"
+    />
     <bottom-nav/>
   </div>
 </template>
@@ -69,7 +75,14 @@ export default {
   methods: {
     actionClick (action) {
       if (action.text === '退出登录') {
-        this.$router.push('/')
+        this.$dialog.confirm({
+          message: `确认退出登录吗？`
+        }).then(() => {
+          sessionStorage.clear()
+          this.$router.push('/')
+        }).catch(err => {
+          console.log('err: ', err)
+        })
       }
     },
     // 筛选
@@ -120,5 +133,9 @@ export default {
         }
       }
     }
+  }
+  /deep/ .custom-image .van-empty__image {
+    width: 90px;
+    height: 90px;
   }
 </style>

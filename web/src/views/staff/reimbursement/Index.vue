@@ -5,6 +5,20 @@
       leftIcon="records"
       leftText="报销单"
     />
+    <van-sticky offset-top="7vh">
+      <van-dropdown-menu active-color="#1989fa">
+        <van-dropdown-item v-model="order" :options="orders" @change="screen(order,status)" />
+        <van-dropdown-item v-model="status" :options="statuses" @change="screen(order,status)" />
+      </van-dropdown-menu>
+    </van-sticky>
+    <van-search
+      v-model="searchValue"
+      show-action
+      shape="round"
+      placeholder="请输入报销事由关键字"
+      @search="onSearch"
+      @cancel="onCancel"
+    />
     <ul v-if="list.length">
       <van-swipe-cell v-for="(item, index) in list" :key="index" :name="item.id" ref="swipeCell" :before-close="beforeClose">
         <li @click="handleClick(item)">
@@ -17,12 +31,11 @@
           <div class="bottom">
             <div>项目名称：{{ item.group_name }}</div>
             <div>报销金额：￥{{ item.reim_amount }}</div>
-            <div>报销时间：{{ item.create_date }}</div>
+            <div>发起时间：{{ item.create_date }}</div>
           </div>
         </li>
         <template #right>
           <van-button v-show="item.status===3" square text="删除" type="danger" class="delete-button" />
-          <!-- <van-button square text="删除" type="danger" class="delete-button" /> -->
         </template>
       </van-swipe-cell>
     </ul>
@@ -50,16 +63,49 @@ export default {
     return {
       reimStatus: reimStatus,
       reimStatusColor: reimStatusColor,
-      list: []
+      searchValue: '',
+      list: [],
+      order: 'DESC',
+      status: 'all',
+      orders: [
+        { text: '按发起时间降序', value: 'DESC' },
+        { text: '按发起时间升序', value: 'ASC' }
+      ],
+      statuses: [
+        { text: '全部状态', value: 'all' },
+        { text: '进行中', value: 0 },
+        { text: '未确认', value: 1 },
+        { text: '已完成', value: 2 },
+        { text: '已撤回', value: 3 }
+      ]
     }
   },
   created () {
-    this.getList()
+    this.screen(this.order, this.status)
   },
   methods: {
-    async getList () {
+    async onSearch () {
       let uid = sessionStorage.getItem('userId')
-      const res = await this.$ajax.post(`/users/reimList`, { uid })
+      let params = {
+        uid,
+        value: this.searchValue
+      }
+      const res = await this.$ajax.post(`/users/searchReim?`, params)
+      if (res.data.code === 200) {
+        this.list = res.data.data
+        this.order = 'DESC'
+        this.status = 'all'
+      }
+    },
+    onCancel () {
+      this.screen(this.order, this.status)
+    },
+    // 筛选
+    async screen (order, status) {
+      this.searchValue = ''
+      let uid = sessionStorage.getItem('userId')
+      let params = { uid, order, status }
+      const res = await this.$ajax.post(`/users/screenReim`, params)
       if (res.data.code === 200) {
         this.list = res.data.data
       }
@@ -80,7 +126,7 @@ export default {
             console.log('name: ', name)
             this.$ajax.post('/users/deleteReim', { reimId: name }).then(res => {
               this.$toast.success('删除成功！')
-              this.getList()
+              this.screen(this.order, this.status)
               instance.close()
             })
           }).catch(() => {})

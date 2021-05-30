@@ -26,7 +26,7 @@
         </div>
         <div class="bottom">
           <div>性别：{{ item.sex }}</div>
-          <div>项目组：{{ item.groupName }}</div>
+          <div>项目组：{{ item.groupName }} ( {{item.groupNumber}} )</div>
         </div>
         <div class="right-btn" @click="handleClick(item)">
           <i>报销单({{ item.reimNum }})</i>
@@ -85,7 +85,6 @@ export default {
       const res = await this.$ajax.get('/admin/memberList')
       if (res.data.code === 200) {
         this.list = res.data.data
-        console.log('this.list: ', this.list)
       }
     },
     async getColumns () {
@@ -128,7 +127,6 @@ export default {
       }
     },
     async remove () {
-      console.log('result: ', this.result)
       if (this.result.length) {
         this.$dialog.confirm({
           message: `确认删除成员吗？`
@@ -149,7 +147,6 @@ export default {
     },
     // 转移
     transfer () {
-      console.log('result: ', this.result)
       if (this.result.length) {
         this.showPicker = true
       } else {

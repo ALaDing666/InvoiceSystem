@@ -7,10 +7,9 @@
       <div class="detail">
         <span class="icon-line"></span>
         <van-cell-group title="个人资料" :border="false">
-          <van-cell title="项目组" :value="model.groupName" size="large" icon="wap-home" />
+          <van-cell title="项目组" :value="model.groupName+' ( '+model.groupNumber+' )'" size="large" icon="wap-home" />
           <van-cell title="工号" :value="model.number" size="large" icon="setting" />
           <van-cell title="性别" :value="model.sex" size="large" icon="manager" />
-          <!-- <van-cell title="手机号" value="13777856952" size="large" icon="phone" /> -->
           <van-cell title="修改密码" size="large" icon="lock" is-link @click="modify()"/>
           <van-cell title="退出登录" size="large" icon="share" is-link @click="signOut()"/>
         </van-cell-group>
@@ -33,6 +32,7 @@ export default {
       model: {
         name: '',
         groupName: '',
+        groupNumber: '',
         number: '',
         sex: ''
       }

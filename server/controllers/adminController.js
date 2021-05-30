@@ -75,19 +75,21 @@ confirmReim = async (req, res) => {
 }
 
 // 添加项目组post
-addGroup = (req, res) => {
-  let { name, descpt } = req.body // 获取前端所传的项目组信息
-  // 执行数据库插入数据操作
-  var sql = `insert into grouplist(name,descpt,create_date) values('${name}','${descpt}',CURDATE())`
-  var callBack = (err, result) => {
-    if(err) {
-      res.json({ code: 500, msg: err.message })
-    } else {
-      // 表示执行成功
+addGroup = async (req, res) => {
+  let { name, number, descpt } = req.body // 获取前端所传的项目组信息
+  let sql = `select * from grouplist where number='${number}'`
+  let result = await dbConfig.SySqlConnect(sql)
+  if (result.length > 0) {
+    res.json({ code: 400, msg: '该项目组编号已存在' })
+  } else {
+    let sql1 = `insert into grouplist(name,number,descpt,create_date) values('${name}','${number}','${descpt}',CURDATE())`
+    let result1 = await dbConfig.SySqlConnect(sql1)
+    if (result1.affectedRows===1) {
       res.json({ code: 200, msg: 'success!' })
+    } else {
+      res.json({ code: 500, msg: err.message })
     }
   }
-  dbConfig.sqlConnect(sql, callBack)
 }
 
 // 获取项目组列表get
@@ -179,10 +181,17 @@ modifyGroup = async (req, res) => {
   let { groupId, name, descpt } = req.body
   let sql = `update grouplist set name='${name}',descpt='${descpt}' where id=${groupId}`
   let result = await dbConfig.SySqlConnect(sql)
-  res.json({
-    code: 200,
-    msg: 'success!'
-  })
+  if (result.affectedRows > 0) {
+    res.json({
+      code: 200,
+      msg: 'success!'
+    })
+  } else {
+    res.json({
+      code: 500,
+      msg: 'fail!'
+    })
+  }
 }
 
 // 添加成员post
@@ -211,7 +220,9 @@ memberList = async (req, res) => {
   let result = await dbConfig.SySqlConnect(sql)
   if (result.length) {
     for (var item of result) {
-      item.groupName = await common.getGroupName(item.group_id)
+      let res = await common.getGroupInfo(item.group_id)
+      item.groupName = res.name
+      item.groupNumber = res.number
       item.reimNum = await common.getMemReimNum(item.id)
     }
   }
@@ -227,6 +238,14 @@ searchMember = async (req, res) => {
   let { value } = req.query
   let sql = `select * from staff where name like '%${value}%' or number like '%${value}%'`
   let result = await dbConfig.SySqlConnect(sql)
+  if (result.length) {
+    for (var item of result) {
+      let res = await common.getGroupInfo(item.group_id)
+      item.groupName = res.name
+      item.groupNumber = res.number
+      item.reimNum = await common.getMemReimNum(item.id)
+    }
+  }
   res.json({
     code: 200,
     data: result,

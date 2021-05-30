@@ -18,15 +18,14 @@
             <van-radio :name="1" />
           </template>
         </van-cell>
-        <van-cell title="火车票" clickable @click="type = 2">
+        <van-cell title="定额发票" clickable @click="type = 2">
           <template #right-icon>
             <van-radio :name="2" />
           </template>
         </van-cell>
       </van-cell-group>
     </van-radio-group>
-    <!-- <input type="file" name="file" capture="camera" @change="takePhoto($event)"> -->
-    <!-- <input type="file" name="file" accept="image/*" @change="takePhoto($event)"> -->
+
     <van-overlay :show="show">
       <van-loading size="30px" vertical>正在扫描中...</van-loading>
     </van-overlay>
@@ -91,21 +90,9 @@ export default {
         })
       } else {
         this.show = false
-        this.$toast.fail('扫描有误')
+        this.$toast.fail(res.data.msg)
       }
     }
-
-    // takePhoto (e) { // 拍照功能---上传头像
-    //   var file = e.target.files[0] // 获取文件对象
-    //   var fd = new FormData() // 构造formdata对象
-    //   fd.append('file', file) // 向formdata里面存放键值对
-    //   // fd.append('uid', this.$store.getters.getUid) // 向formdata里面存放键值对，this.$store.getters.getUid是用户的uid
-    //   this.axios.post('http://127.0.0.1:7000/me/upAvatar', fd).then(res => {
-    //     if (res.data.code === 200) {
-    //       this.getAvatar() // 如果上传成功，则获取图片的地址
-    //     }
-    //   })
-    // }
   }
 }
 

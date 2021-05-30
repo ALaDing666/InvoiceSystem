@@ -43,8 +43,10 @@ getUserInfo = async (req, res) => {
   let { number } = req.body
   let sql = `select * from staff where number=${number}`
   let result = await dbConfig.SySqlConnect(sql)
-  if (result) {
-    result[0].groupName = await common.getGroupName(result[0].group_id)
+  if (result[0]) {
+    let result1 = await common.getGroupInfo(result[0].group_id)
+    result[0].groupName = result1.name
+    result[0].groupNumber = result1.number
     if (delete result[0].password) {
       res.json({
         code: 200,
@@ -125,25 +127,21 @@ scanInvoice = async (req, res) => {
   form.uploadDir = uploadDir
   form.keepExtensions = true   // 是否保留后缀
   form.autoFields = true        // 启用文件事件，并禁用部分文件事件，如果监听文件事件，则默认为true
-  form.parse(req, function(err, fields, file) {
+  form.parse(req, async function(err, fields, file) {
     let { type } = fields
     let imgName = file.file[0].path.split('images\\')[1]
     console.log('imgName: ', imgName)
     let opt = {}
     let ocrClientAksk = demo.ocrClientAksk
-    // let httpUri = '/v1.0/ocr/vat-invoice'
     let httpUri = Enum.uriType[type]
-    ocrClientAksk.requestOcrServiceBase64(httpUri, `./public/images/${imgName}`, opt).then(result => {
+    ocrClientAksk.requestOcrServiceBase64(httpUri, `./public/images/${imgName}`, opt).then(async result => {
       if (result.statusCode === 200) {
         res.json({ code: 200, data: result.result, msg: 'success!' })
       } else {
         res.json({ code: 500, msg: 'fail!' })
       }
     }).catch(error => {
-      res.json({
-        code: 400,
-        msg: error
-      })
+      res.json({ code: 400, msg: '扫描有误' })
     })
     fs.unlink(`${uploadDir}/${imgName}`, (err) => {
       if (err) {
@@ -154,20 +152,19 @@ scanInvoice = async (req, res) => {
 }
 
 // 取消发票录入post
-cancelSave = async (req, res) => {
-  let { imgName } = req.body
-  console.log('imgName: ', imgName)
-  let uploadDir = path.resolve(__dirname,'../public/images')
-  fs.unlink(`${uploadDir}/${imgName}`, (err) => {
-    if (err) {
-      throw err
-    }
-    res.json({
-      code: 200,
-      msg: 'success!'
-    })
-  })
-}
+// cancelSave = async (req, res) => {
+//   let { imgName } = req.body
+//   let uploadDir = path.resolve(__dirname,'../public/images')
+//   fs.unlink(`${uploadDir}/${imgName}`, (err) => {
+//     if (err) {
+//       throw err
+//     }
+//     res.json({
+//       code: 200,
+//       msg: 'success!'
+//     })
+//   })
+// }
 
 // 保存发票post
 saveInvoice = async (req, res) => {
@@ -184,7 +181,7 @@ saveInvoice = async (req, res) => {
     obj.pic = ''
     if (file.file) {
       imgName = file.file[0].path.split('images\\')[1]
-      obj.pic = `http://localhost:3000/images/${imgName}`
+      obj.pic = `images/${imgName}`
       console.log('imgName: ', imgName)
     }
     if (obj.type === 3) { // 其他发票
@@ -213,12 +210,12 @@ saveInvoice = async (req, res) => {
           }
         })
       } else {
-        let { uid, type, pic, code, number, taxi_number, issue_date, total, time, unit_price,
-          distance, buyer_name, seller_name, remarks } = obj
-        let str = 'type,pic,code,number,taxi_number,issue_date,total,time,unit_price,'
+        let { uid, type, pic, code, number, taxi_number, issue_date, total, location, time,
+          unit_price, distance, buyer_name, seller_name, remarks } = obj
+        let str = 'type,pic,code,number,taxi_number,issue_date,total,location,time,unit_price,'
           +'distance,buyer_name,seller_name,create_date,remarks,staff_id'
         let sql1 = `insert into invoice_vat(${str}) values(${type},'${pic}','${code}','${number}','${taxi_number}','${issue_date}',${
-          total},'${time}',${unit_price},${distance},'${buyer_name}','${seller_name}',NOW(),'${remarks}',${uid})`
+          total},'${location}','${time}',${unit_price},${distance},'${buyer_name}','${seller_name}',NOW(),'${remarks}',${uid})`
         let result1 = await dbConfig.SySqlConnect(sql1)
         if (result1.affectedRows === 1) {
           res.json({ code: 200, msg: 'success!' })
@@ -237,10 +234,10 @@ saveInvoice = async (req, res) => {
 
 // 更新发票post
 updateInvoice = async (req, res) => {
-  let { id, type, code, number, taxi_number, issue_date, total, time, unit_price,
+  let { id, type, code, number, taxi_number, issue_date, total, location, time, unit_price,
     distance, buyer_name, seller_name, remarks } = req.body
   let sql = `update invoice_vat set type=${type},code='${code}',number='${number}',taxi_number='${
-    taxi_number}',issue_date='${issue_date}',total=${total},time='${time}',unit_price=${unit_price},distance=${
+    taxi_number}',issue_date='${issue_date}',total=${total},location='${location}',time='${time}',unit_price=${unit_price},distance=${
     distance},buyer_name='${buyer_name}',seller_name='${seller_name}',remarks='${remarks}' where id=${id}`
   let result = await dbConfig.SySqlConnect(sql)
   if (result.affectedRows === 1) {
@@ -314,12 +311,11 @@ deleteInvoice = async (req, res) => {
 
 // 发起报销post
 initiateReim = async (req, res) => {
-  let { uid, ids, group_id, group_name, reim_person, invo_amount, invo_quantity, reim_amount, reason } = req.body
-  let str = 'group_id,group_name,reim_person,invo_amount,invo_quantity,reim_amount,reason,create_date,staff_id'
-  let sql = `insert into reimburse(${str}) values(${group_id},'${group_name}','${reim_person}',
+  let { uid, ids, group_id, group_name, group_number, reim_person, invo_amount, invo_quantity, reim_amount, reason } = req.body
+  let str = 'group_id,group_name,group_number,reim_person,invo_amount,invo_quantity,reim_amount,reason,create_date,staff_id'
+  let sql = `insert into reimburse(${str}) values(${group_id},'${group_name}','${group_number}','${reim_person}',
     '${invo_amount}','${invo_quantity}',${reim_amount},'${reason}',NOW(),${uid})`
   let result = await dbConfig.SySqlConnect(sql)
-  console.log('result: ', result)
   if (result.affectedRows === 1) {
     let idString = ids.join(',')
     let sql1 = `update invoice_vat set status=1,reim_id=${result.insertId} where id in (${idString})`
@@ -346,6 +342,18 @@ screenReim = async (req, res) => {
     str = `status=${status} and`
   }
   let sql = `select * from reimburse where ${str} staff_id=${uid} order by create_date ${order}`
+  let result = await dbConfig.SySqlConnect(sql)
+  res.json({
+    code: 200,
+    data: result,
+    msg: 'success!'
+  })
+}
+
+// 搜索报销单post
+searchReim = async (req, res) => {
+  let { uid, value } = req.body
+  let sql = `select * from reimburse where staff_id=${uid} and reason like '%${value}%'`
   let result = await dbConfig.SySqlConnect(sql)
   res.json({
     code: 200,
@@ -460,13 +468,14 @@ module.exports = {
   // invoiceList,
   getInvoice,
   scanInvoice,
-  cancelSave,
+  // cancelSave,
   saveInvoice,
   updateInvoice,
   screenInvoice,
   deleteInvoice,
   initiateReim,
   screenReim,
+  searchReim,
   reimInvoice,
   withdrawReim,
   reInitiate,

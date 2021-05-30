@@ -22,13 +22,13 @@ let getMemberNum = async (id) => {
 
 // 获取项目组报销单数
 let getReimNum = async (id) => {
-  let sql = `select * from reimburse where group_id=${id}`
+  let sql = `select * from reimburse where group_id=${id} and status in (0,1,2)`
   let res = await dbConfig.SySqlConnect(sql)
   return res.length
 }
 // 获取成员报销单数
 let getMemReimNum = async (id) => {
-  let sql = `select * from reimburse where staff_id=${id}`
+  let sql = `select * from reimburse where staff_id=${id} and status in (0,1,2)`
   let res = await dbConfig.SySqlConnect(sql)
   return res.length
 }
@@ -43,12 +43,12 @@ let getMembers = async (id) => {
   return res
 }
 
-// 获取项目组名称
-let getGroupName = async (id) => {
+// 获取项目组信息
+let getGroupInfo = async (id) => {
   let sql = `select * from grouplist where id=${id}`
   let res = await dbConfig.SySqlConnect(sql)
   if (res.length) {
-    return res[0].name
+    return res[0]
   } else {
     return ''
   }
@@ -60,5 +60,5 @@ module.exports = {
   getReimNum,
   getMemReimNum,
   getMembers,
-  getGroupName
+  getGroupInfo
 }

@@ -11,7 +11,7 @@
         center
         :title="model.group_name"
         size="large"
-        :label="model.create_date"
+        :label="model.group_number"
       >
       <template #right-icon>
         <van-tag
@@ -22,6 +22,7 @@
       </template>
       </van-cell>
       <van-cell title="报销人" :value="model.reim_person" />
+      <van-cell title="发起时间" :value="model.create_date" />
       <van-cell title="发票金额" :value="'￥' + model.invo_amount" />
       <van-cell title="发票张数" :value="model.invo_quantity" />
       <van-cell title="报销金额" :value="'￥' + model.reim_amount" />
@@ -55,6 +56,10 @@
           <div>上下车时间：{{ item.time }}</div>
           <div>开票日期：{{ item.issue_date }}</div>
         </div>
+        <div class="bottom" v-if="item.type===2">
+          <div>地址：{{ item.location }}</div>
+          <div>备注：{{ item.remarks }}</div>
+        </div>
         <div class="bottom" v-if="item.type===3">
           <div>备注：{{ item.remarks }}</div>
           <div>开票日期：{{ item.issue_date }}</div>
@@ -79,6 +84,7 @@ export default {
       reimStatusColor: reimStatusColor,
       model: {
         group_name: '',
+        group_number: '',
         create_date: '',
         status: 0,
         invo_amount: '',

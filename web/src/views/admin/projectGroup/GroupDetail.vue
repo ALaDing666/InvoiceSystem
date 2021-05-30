@@ -10,7 +10,8 @@
       @leftClick="leftClick"
     />
     <van-cell-group>
-      <van-cell title="项目组名称" size="large" :value="model.name" />
+      <van-cell title="名称" size="large" :value="model.name" />
+      <van-cell title="编号" size="large" :value="model.number" />
       <van-cell title="创建时间" size="large" :value="model.create_date" />
       <van-cell title="成员人数" size="large" :value="model.memberNum" />
       <van-cell title="报销单数" size="large" :value="model.reimNum" />
@@ -41,7 +42,7 @@
     <van-cell v-show="list.length" class="bottom-cell">
       <van-checkbox v-model="allChecked" @click="handleSelectAll()">全选</van-checkbox>
       <template #right-icon>
-          <!-- <van-button plain hairline type="danger" size="small" @click="remove()">删除</van-button> -->
+          <van-button plain hairline type="danger" size="small" @click="remove()">删除</van-button>
           <van-button plain hairline type="info" size="small" @click="transfer()">转移</van-button>
       </template>
     </van-cell>
@@ -69,6 +70,7 @@ export default {
     return {
       model: {
         name: '',
+        number: '',
         create_date: '',
         memberNum: 0,
         reimNum: 0,
@@ -115,6 +117,7 @@ export default {
           query: {
             groupId: this.groupId,
             name: this.model.name,
+            number: this.model.number,
             descpt: this.model.descpt
           }
         })
@@ -145,17 +148,27 @@ export default {
         this.$refs.checkboxGroup.toggleAll(true)
       }
     },
-    remove () {
-      console.log('result: ', this.result)
+    async remove () {
       if (this.result.length) {
-
+        this.$dialog.confirm({
+          message: `确认删除成员吗？`
+        }).then(() => {
+          let params = { membersId: this.result }
+          this.$ajax.post('/admin/deleteMember', params).then(res => {
+            if (res.data.code === 200) {
+              this.$toast.success('删除成功！')
+              this.getDetail(this.groupId)
+            }
+          })
+        }).catch(err => {
+          console.log('err: ', err)
+        })
       } else {
         this.$toast.fail('未选择成员')
       }
     },
     // 转移
     transfer () {
-      console.log('result: ', this.result)
       if (this.result.length) {
         this.showPicker = true
       } else {

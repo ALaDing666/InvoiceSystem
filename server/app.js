@@ -51,7 +51,7 @@ app.use('/api/users', usersRouter);
 app.use(function(req, res, next) {
  // req.url 表示当前地址
  const { url, headers: { authorization: token } } = req
- console.log('url: ', url)
+//  console.log('token验证url: ', url)
  // const url = req.url
  // const { authorization: token } = req.headers
  // const token = req.headers.authorization

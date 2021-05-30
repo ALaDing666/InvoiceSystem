@@ -8,11 +8,21 @@
     />
     <van-form @submit="confirm()">
       <van-field
+        v-model="model.number"
+        :required="!readonly"
+        name="项目组编号"
+        label="项目组编号"
+        placeholder="请填写项目组编号"
+        :rules="[{ required: true, message: '' }]"
+        :readonly="readonly"
+      />
+      <van-field
         v-model="model.name"
+        required
         name="项目组名称"
         label="项目组名称"
-        placeholder="项目组名称"
-        :rules="[{ required: true, message: '请填写项目组名称' }]"
+        placeholder="请填写项目组名称"
+        :rules="[{ required: true, message: '' }]"
       />
       <van-field
         v-model="model.descpt"
@@ -23,10 +33,9 @@
         show-word-limit
         maxlength="60"
         autosize
-        :rules="[{ required: true, message: '请输入相关描述' }]"
       />
       <div class="btn-group">
-        <van-button plain hairline size="small" type="info" @click="cancel()">取消</van-button>
+        <van-button plain hairline size="small" type="info" native-type="button" @click="cancel()">取消</van-button>
         <van-button plain hairline size="small" type="info" native-type="submit">确定</van-button>
       </div>
     </van-form>
@@ -45,13 +54,16 @@ export default {
       groupId: this.$route.query.groupId,
       model: {
         name: '',
+        number: '',
         descpt: ''
-      }
+      },
+      readonly: false
     }
   },
   created () {
     if (this.groupId) {
       this.model = this.$route.query
+      this.readonly = true
     }
   },
   methods: {
@@ -67,12 +79,16 @@ export default {
         if (res.data.code === 200) {
           this.$toast.success('修改成功！')
           this.$router.go(-1)
+        } else {
+          this.$toast.fail(res.data.msg)
         }
       } else { // 添加项目组
         const res = await this.$ajax.post('/admin/addGroup', this.model)
         if (res.data.code === 200) {
           this.$toast.success('添加成功！')
           this.$router.push('/projectGroup')
+        } else {
+          this.$toast.fail(res.data.msg)
         }
       }
     }

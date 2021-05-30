@@ -32,6 +32,7 @@ const InvoiceFolder = () => import('@/views/staff/invoiceFolder')
 const ManualEntry = () => import('@/views/staff/invoiceFolder/ManualEntry.vue')
 const ScanInvoice = () => import('@/views/staff/invoiceFolder/ScanInvoice.vue')
 const InvoiceDetail = () => import('@/views/staff/invoiceFolder/InvoiceDetail.vue')
+const QuotaDetail = () => import('@/views/staff/invoiceFolder/QuotaDetail.vue')
 const Initiate = () => import('@/views/staff/invoiceFolder/Initiate.vue')
 
 const Reimbursement = () => import('@/views/staff/reimbursement')
@@ -117,6 +118,11 @@ const staffRoutes = [
     path: '/invoiceDetail',
     name: 'InvoiceDetail',
     component: InvoiceDetail
+  },
+  {
+    path: '/quotaDetail',
+    name: 'QuotaDetail',
+    component: QuotaDetail
   },
   {
     path: '/initiate',

@@ -95,4 +95,8 @@ export default {
       }
     }
   }
+  /deep/ .custom-image .van-empty__image {
+    width: 90px;
+    height: 90px;
+  }
 </style>
