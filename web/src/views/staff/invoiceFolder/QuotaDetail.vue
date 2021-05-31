@@ -24,7 +24,7 @@
       :rules="[{ required: true, message: '' }]"
       name="含税金额"
       type="number"
-      label="含税金额"
+      label="含税金额 (元)"
       placeholder="请输入含税金额"
       :readonly="readonly"
     />

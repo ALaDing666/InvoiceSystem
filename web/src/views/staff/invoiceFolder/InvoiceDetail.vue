@@ -21,8 +21,9 @@
         placeholder="-"
         readonly
       />
+
       <van-field
-        v-if="type!==3&&type!==2"
+        v-if="type!==3"
         v-model="model.code"
         required
         :rules="[{ required: true, message: '' }]"
@@ -32,7 +33,7 @@
         :readonly="readonly"
       />
       <van-field
-        v-if="type!==3&&type!==2"
+        v-if="type!==3"
         v-model="model.number"
         required
         :rules="[{ required: true, message: '' }]"
@@ -62,98 +63,109 @@
           @cancel="showPicker = false"
         />
       </van-popup>
+      <van-field
+        v-if="type!==1"
+        v-model="model.total"
+        required
+        :rules="[{ required: true, message: '' }]"
+        name="含税金额"
+        type="number"
+        label="含税金额 (元)"
+        placeholder="请输入含税金额"
+        :readonly="readonly"
+      />
+
+      <!-- 定额发票专有 -->
+      <van-field
+        v-if="type===2"
+        v-model="model.location"
+        required
+        :rules="[{ required: true, message: '' }]"
+        name="地址"
+        label="地址"
+        placeholder="请输入地址"
+        :readonly="readonly"
+      />
 
       <!-- 增值税专有 -->
-      <!-- <div v-show="type===0"> -->
-        <van-field
-          v-if="type===0||type===3"
-          v-model="model.total"
-          required
-          :rules="[{ required: true, message: '' }]"
-          name="含税金额"
-          type="number"
-          label="含税金额"
-          placeholder="请输入含税金额"
-          :readonly="readonly"
-        />
-        <van-field
-          v-if="type===0"
-          v-model="model.buyer_name"
-          required
-          :rules="[{ required: true, message: '' }]"
-          name="购买方"
-          label="购买方"
-          placeholder="请输入购买方"
-          :readonly="readonly"
-        />
-        <van-field
-          v-if="type===0"
-          v-model="model.seller_name"
-          required
-          :rules="[{ required: true, message: '' }]"
-          name="销售方"
-          label="销售方"
-          placeholder="请输入销售方"
-          :readonly="readonly"
-        />
-      <!-- </div> -->
+      <van-field
+        v-if="type===0"
+        v-model="model.buyer_name"
+        required
+        :rules="[{ required: true, message: '' }]"
+        name="购买方"
+        label="购买方"
+        placeholder="请输入购买方"
+        :readonly="readonly"
+      />
+      <van-field
+        v-if="type===0"
+        v-model="model.seller_name"
+        required
+        :rules="[{ required: true, message: '' }]"
+        name="销售方"
+        label="销售方"
+        placeholder="请输入销售方"
+        :readonly="readonly"
+      />
 
       <!-- 出租车专有 -->
-        <van-field
-          v-if="type===1"
-          v-model="model.taxi_number"
-          required
-          :rules="[{ required: true, message: '' }]"
-          name="车号"
-          label="车号"
-          placeholder="请输入车号"
-          :readonly="readonly"
-        />
-        <van-field
-          v-if="type===1"
-          v-model="model.time"
-          required
-          :rules="[{ required: true, message: '' }]"
-          name="上下车时间"
-          label="上下车时间"
-          placeholder="请输入上下车时间"
-          :readonly="readonly"
-        />
-        <van-field
-          v-if="type===1"
-          v-model="model.unit_price"
-          required
-          :rules="[{ required: true, message: '' }]"
-          name="单价"
-          type="number"
-          label="单价"
-          placeholder="请输入单价"
-          :readonly="readonly"
-        />
-        <van-field
-          v-if="type===1"
-          v-model="model.distance"
-          required
-          :rules="[{ required: true, message: '' }]"
-          name="总里程"
-          type="number"
-          label="总里程"
-          placeholder="请输入总里程"
-          :readonly="readonly"
-        />
-        <van-field
-          v-if="type===1"
-          v-model="model.total"
-          required
-          :rules="[{ required: true, message: '' }]"
-          name="实收金额"
-          type="number"
-          label="实收金额"
-          placeholder="请输入实收金额"
-          :readonly="readonly"
-        />
+      <van-field
+        v-if="type===1"
+        v-model="model.taxi_number"
+        required
+        :rules="[{ required: true, message: '' }]"
+        name="车号"
+        label="车号"
+        placeholder="请输入车号"
+        :readonly="readonly"
+      />
+      <van-field
+        v-if="type===1"
+        v-model="model.time"
+        required
+        :rules="[{ required: true, message: '' }]"
+        name="上下车时间"
+        label="上下车时间"
+        placeholder="请输入上下车时间"
+        :readonly="readonly"
+      />
+      <van-field
+        v-if="type===1"
+        v-model="model.unit_price"
+        required
+        :rules="[{ required: true, message: '' }]"
+        name="单价"
+        type="number"
+        label="单价 (元)"
+        placeholder="请输入单价"
+        :readonly="readonly"
+      />
+      <van-field
+        v-if="type===1"
+        v-model="model.distance"
+        required
+        :rules="[{ required: true, message: '' }]"
+        name="总里程"
+        type="number"
+        label="总里程 (km)"
+        placeholder="请输入总里程"
+        :readonly="readonly"
+      />
+      <van-field
+        v-if="type===1"
+        v-model="model.total"
+        required
+        :rules="[{ required: true, message: '' }]"
+        name="实收金额"
+        type="number"
+        label="实收金额 (元)"
+        placeholder="请输入实收金额"
+        :readonly="readonly"
+      />
 
-      <quota-detail v-if="type===2" :readonly="readonly" :quota="model"></quota-detail>
+      <!-- <quota-detail v-if="type===2" :readonly="readonly" :quota="model"></quota-detail> -->
+      <!-- 共有的 -->
       <van-field
         v-model="model.remarks"
         type="textarea"
@@ -343,9 +355,6 @@ export default {
   // margin-top: 20px;
   padding-bottom: 8px;
   background-color: white;
-  // /deep/.status-field input{
-  //   color: rgb(143, 143, 143);
-  // }
   .van-cell__title {
     font-size: 16px;
     font-weight: 700;
