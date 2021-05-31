@@ -138,10 +138,10 @@ scanInvoice = async (req, res) => {
       if (result.statusCode === 200) {
         res.json({ code: 200, data: result.result, msg: 'success!' })
       } else {
-        res.json({ code: 500, msg: 'fail!' })
+        res.json({ code: 400, msg: '上传图片有误' })
       }
     }).catch(error => {
-      res.json({ code: 400, msg: '扫描有误' })
+      res.json({ code: 500, msg: 'fail!' })
     })
     fs.unlink(`${uploadDir}/${imgName}`, (err) => {
       if (err) {
@@ -189,6 +189,7 @@ saveInvoice = async (req, res) => {
       let sql = `insert into invoice_vat(type,pic,issue_date,total,create_date,remarks,staff_id) values(${
         type},'${pic}','${issue_date}',${total},NOW(),'${remarks}',${uid})`
       let result = await dbConfig.SySqlConnect(sql)
+      console.log('result111111111: ', result)
       if (result.affectedRows === 1) {
         res.json({ code: 200, msg: 'success!' })
       } else {

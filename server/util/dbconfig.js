@@ -18,7 +18,7 @@ module.exports = {
     pool.getConnection((err, conn) => {
       console.log('pool.getConnection...')
       if (err) {
-        console.log('连接失败')
+        console.log('连接失败err：', err)
       } else {
         //事件驱动回调
         conn.query(sql, callBack)
@@ -47,7 +47,7 @@ module.exports = {
         }
       })
     }).catch((err) => {
-      console.log(err)
+      console.log('连接失败err：', err)
     })
   }
 }
