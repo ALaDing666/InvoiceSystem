@@ -42,7 +42,7 @@
     <van-cell v-show="list.length" class="bottom-cell">
       <van-checkbox v-model="allChecked" @click="handleSelectAll()">全选</van-checkbox>
       <template #right-icon>
-          <van-button plain hairline type="danger" size="small" @click="remove()">删除</van-button>
+          <!-- <van-button plain hairline type="danger" size="small" @click="remove()">删除</van-button> -->
           <van-button plain hairline type="info" size="small" @click="transfer()">转移</van-button>
       </template>
     </van-cell>
