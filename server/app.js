@@ -24,11 +24,11 @@ var server = http.createServer(app);
 
 // 跨域问题解决方法
 app.use(cors({
-  origin:['http://192.168.0.9:8080'],
+  origin:['http://localhost:8080'],
   methods:['GET','POST'],
 }));
 app.all('*',function (req, res, next) {
-  res.header('Access-Control-Allow-Origin', 'http://192.168.0.9:8080');
+  res.header('Access-Control-Allow-Origin', 'http://localhost:8080');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
   res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
 　next();　
@@ -51,21 +51,20 @@ app.use('/api/users', usersRouter);
 app.use(function(req, res, next) {
  // req.url 表示当前地址
  const { url, headers: { authorization: token } } = req
-//  console.log('token验证url: ', url)
- // const url = req.url
- // const { authorization: token } = req.headers
- // const token = req.headers.authorization
-
  // 不需要验证的请求地址
  if (url === '/' || url === '/staffLogin') return next()
-
  // 来到这里表示需要 token 验证
- if (!token) return res.send({ message: '请携带 token 请求', code: 0 })
+ if (!token)
+  return res.send({ message: '请携带 token 请求', code: 0 })
 
  jwt.verify(token, 'Josiah', (err, data) => {
-   if (err && err.message === 'invalid token') return res.send({ message: '无效 token', code: 0 })
-   if (err && err.message === 'jwt expired') return res.send({ message: 'token 失效', code: 0 })
-   next()
+  if (err && err.message === 'invalid token') {
+    return res.send({ message: '无效 token', code: 0 })
+  }
+  if (err && err.message === 'jwt expired') {
+    return res.send({ message: 'token 失效', code: 0 })
+  }
+  next()
  })
 })
 

@@ -179,6 +179,7 @@ export default {
             if (res.data.code === 200) {
               this.$toast.success('删除成功！')
               this.screen(this.order, this.type, this.status)
+              this.allChecked = false
             }
           })
         }).catch(err => {

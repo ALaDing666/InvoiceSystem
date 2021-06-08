@@ -52,6 +52,7 @@
         label="开票日期"
         placeholder="选择日期"
         @click="isShowPicker"
+        @focus="forbid"
         :readonly="readonly"
       />
       <van-popup v-model="showPicker" position="bottom">
@@ -250,13 +251,17 @@ export default {
     } else if (this.$route.params.item) { // 发票详情
       let item = this.$route.params.item
       this.model = item
-      this.model.pic = `http://192.168.0.9:3000/${item.pic}`
+      this.model.pic = `http://localhost:3000/${item.pic}`
       this.type = item.type
       this.status = item.status
       this.readonly = true
     }
   },
   methods: {
+    forbid () {
+      // 禁止软键盘弹出
+      document.activeElement.blur()
+    },
     leftClick () {
       if (this.$route.params.result) {
         this.cancel()

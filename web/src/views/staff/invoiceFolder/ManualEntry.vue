@@ -21,6 +21,7 @@
         label="开票日期"
         placeholder="选择日期"
         @click="isShowPicker"
+        @focus="forbid"
         :readonly="readonly"
       />
       <van-popup v-model="showPicker" position="bottom">
@@ -86,6 +87,10 @@ export default {
     }
   },
   methods: {
+    forbid () {
+      // 禁止软键盘弹出
+      document.activeElement.blur()
+    },
     leftClick () {
       this.$router.go(-1)
     },

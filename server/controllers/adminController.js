@@ -156,24 +156,20 @@ disbandGroup = (req, res) => {
 }
 
 // 搜索项目组post
-searchGroup = (req, res) => {
+searchGroup = async (req, res) => {
   let { value } = req.query
   var sql = `select * from grouplist where name like '%${value}%'`
-  var callBack = (err, result) => {
-    if(err) {
-      res.json({
-        code: 500,
-        msg: err.message
-      })
-    } else {
-      res.json({
-        code: 200,
-        data: result,
-        msg: 'success!'
-      })
+  let result = await dbConfig.SySqlConnect(sql)
+  if (result.length) {
+    for (var item of result) {
+      item.memberNum = await common.getMemberNum(item.id)
     }
   }
-  dbConfig.sqlConnect(sql, callBack)
+  res.json({
+    code: 200,
+    data: result,
+    msg: 'success!'
+  })
 }
 
 // 修改项目组信息post
